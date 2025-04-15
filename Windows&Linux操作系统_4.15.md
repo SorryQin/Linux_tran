@@ -24,6 +24,113 @@
 ### 文本编辑器与开发环境
 - **文本编辑器**：掌握至少一种Linux上常用的文本编辑器，如Vim、Emacs或Nano等，以便能够方便地编辑C++ 源代码。了解这些编辑器的基本操作命令，如插入、删除、查找、替换等。
 - **集成开发环境（IDE）**：了解一些在Linux上常用的C++ 开发IDE，如Eclipse CDT、CLion等。掌握如何在这些IDE中创建项目、配置编译选项、调试程序等基本操作，提高开发效率。
+
+# 库
+将Windows上的C++代码移植到Linux上时，库和依赖管理是关键环节。
+
+### 系统库
+#### 确定系统库差异
+Windows和Linux使用不同的系统库。例如，Windows有Windows API，而Linux有POSIX标准库。检查代码中是否有使用Windows特定的系统库，若有，需替换为Linux等效库。
+比如，在Windows上使用`CreateFile`来进行文件操作，在Linux上可以用`open`函数。
+```cpp
+// Windows 代码示例
+#include <windows.h>
+HANDLE hFile = CreateFile("test.txt", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+
+// Linux 等效代码示例
+#include <fcntl.h>
+#include <unistd.h>
+int fd = open("test.txt", O_RDONLY);
+```
+
+#### 安装系统库
+在Linux上，许多系统库可通过包管理器来安装。例如，Ubuntu系统使用`apt`，CentOS系统使用`yum`。
+若要安装开发工具包，在Ubuntu上可运行以下命令：
+```bash
+sudo apt-get update
+sudo apt-get install build-essential
+```
+
+### 第三方库
+#### 查找可用的Linux版本
+很多流行的第三方库都有适用于Linux的版本。先去官方网站或者开源代码托管平台（如GitHub）查找这些库的Linux版本。
+例如，Boost库是一个广泛使用的C++库集合，你可以从其官方网站下载源码并在Linux上编译安装。
+
+#### 使用包管理器安装
+有些第三方库能通过系统的包管理器直接安装。以OpenCV为例，在Ubuntu上可执行：
+```bash
+sudo apt-get install libopencv-dev
+```
+
+#### 从源码编译安装
+若包管理器中没有所需的库，或者需要特定版本的库，就需要从源码编译安装。步骤如下：
+1. **下载源码**：从官方网站或者代码托管平台获取库的源码压缩包。
+2. **解压源码**：使用`tar`命令解压压缩包，例如：
+```bash
+tar -zxvf library_name.tar.gz
+```
+3. **配置编译选项**：进入解压后的目录，运行`./configure`脚本（如果有），该脚本会检查系统环境并生成Makefile。
+```bash
+cd library_name
+./configure
+```
+4. **编译和安装**：使用`make`命令编译库，再用`make install`命令安装库。
+```bash
+make
+sudo make install
+```
+
+### 静态链接库和动态链接库
+#### 静态链接库（`.a`文件）
+静态链接库会被链接到可执行文件中，使得可执行文件包含所有必要的代码。在Linux上编译时，使用`-static`选项来进行静态链接。
+```bash
+g++ main.cpp -o main -L/path/to/library -lstatic_library_name -static
+```
+
+#### 动态链接库（`.so`文件）
+动态链接库在程序运行时才会被加载。编译时，使用`-L`选项指定库的搜索路径，用`-l`选项指定库名。
+```bash
+g++ main.cpp -o main -L/path/to/library -ldynamic_library_name
+```
+运行程序前，需要确保系统能够找到动态链接库。可以通过设置`LD_LIBRARY_PATH`环境变量来实现：
+```bash
+export LD_LIBRARY_PATH=/path/to/library:$LD_LIBRARY_PATH
+./main
+```
+
+### 依赖管理工具
+#### Conan
+Conan是一个开源的C/C++包管理器，可帮助你管理项目的依赖。使用步骤如下：
+1. **安装Conan**：通过Python的`pip`安装Conan。
+```bash
+pip install conan
+```
+2. **创建`conanfile.txt`**：在项目根目录创建`conanfile.txt`文件，列出项目的依赖。
+```plaintext
+[requires]
+library_name/version
+
+[generators]
+cmake
+```
+3. **安装依赖**：在项目根目录运行以下命令安装依赖。
+```bash
+conan install .
+```
+
+#### vcpkg
+vcpkg是Microsoft开发的跨平台C++包管理器。使用步骤如下：
+1. **安装vcpkg**：从GitHub克隆vcpkg仓库并运行安装脚本。
+```bash
+git clone https://github.com/Microsoft/vcpkg.git
+cd vcpkg
+./bootstrap-vcpkg.sh
+```
+2. **安装依赖**：使用`vcpkg install`命令安装所需的库。
+```bash
+./vcpkg install library_name
+```
+
 # 移植可行性分析
 ## Wine
 Wine（Wine Is Not an Emulator）是一个开源的兼容层，它允许 Windows 应用程序在 Linux 和其他类 Unix 操作系统上运行。Wine 实现了如下功能：
