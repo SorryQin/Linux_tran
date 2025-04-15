@@ -1,6 +1,7 @@
-## 可行性分析
-**wine**
+# Windows & Linux
 
+# 移植可行性分析
+## Wine
 Wine（Wine Is Not an Emulator）是一个开源的兼容层，它允许 Windows 应用程序在 Linux 和其他类 Unix 操作系统上运行。Wine 实现了如下功能：
 - API 翻译：Windows 程序依赖于 Windows API 来调用操作系统的功能，例如文件操作、图形处理、内存管理等。Wine 通过实现一个兼容的 Windows API，把这些 API 调用翻译成对应的 Linux API 调用，从而使得 Windows 程序可以在 Linux 环境中运行。
 - 动态链接库（DLL）替换：Windows 程序通常依赖于各种 Windows 动态链接库（DLL）。Wine 提供了一组与 Windows DLL 相对应的开源实现，以满足 Windows 程序对这些DLL 的需求。这些开源实现的 DLL 可以替代原生的 Windows DLL。
